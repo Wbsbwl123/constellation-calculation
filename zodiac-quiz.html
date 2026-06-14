@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>你更适合哪个星座？</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:#2c2c2c;background:#faf9f7;line-height:1.6;min-height:100vh}
+.app{max-width:480px;margin:0 auto;padding:0 1.25rem;min-height:100vh;display:flex;flex-direction:column}
+.page{display:none;flex-direction:column;flex:1;padding:2rem 0 3rem}
+.page.active{display:flex}
+.welcome-icon{width:80px;height:80px;margin:2rem auto 1.5rem;background:#f0eeeb;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+.welcome-title{font-size:1.75rem;font-weight:700;text-align:center;margin-bottom:.5rem;letter-spacing:-.02em}
+.welcome-subtitle{text-align:center;color:#8a8680;font-size:.9rem;margin-bottom:2.5rem;line-height:1.7}
+.form-group{margin-bottom:1.5rem}
+.form-label{display:block;font-size:.85rem;font-weight:600;color:#8a8680;margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.05em}
+.date-inputs{display:flex;gap:.75rem}
+.date-inputs select{flex:1;padding:.75rem 1rem;border:1.5px solid #e2dfdb;border-radius:10px;font-size:1rem;font-family:inherit;background:#fff;color:#2c2c2c;appearance:none;-webkit-appearance:none}
+.native-zodiac{text-align:center;margin-top:1rem;font-size:.9rem;color:#8a8680;min-height:1.5em}
+.native-zodiac .zodiac-name{color:#c9a96e;font-weight:700}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:.85rem 2rem;border:none;border-radius:12px;font-size:1rem;font-weight:600;font-family:inherit;cursor:pointer;transition:all .25s ease;width:100%}
+.btn-primary{background:#2c2c2c;color:#fff}
+.btn-primary:hover{opacity:.85;transform:translateY(-1px)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.btn-outline{background:transparent;color:#2c2c2c;border:1.5px solid #e2dfdb}
+.btn-outline:hover{border-color:#2c2c2c}
+.btn-group{display:flex;gap:.75rem;margin-top:1.5rem}
+.btn-group .btn{flex:1}
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.5rem}
+.quiz-progress-text{font-size:.8rem;color:#8a8680;font-weight:600}
+.progress-bar{width:100%;height:4px;background:#f0eeeb;border-radius:2px;margin-bottom:2rem;overflow:hidden}
+.progress-fill{height:100%;background:#c9a96e;border-radius:2px;transition:width .4s ease}
+.question-card{flex:1;display:flex;flex-direction:column}
+.question-text{font-size:1.2rem;font-weight:700;margin-bottom:1.75rem;line-height:1.5}
+.options-list{display:flex;flex-direction:column;gap:.75rem;flex:1}
+.option-btn{display:flex;align-items:center;padding:1rem 1.25rem;border:1.5px solid #e2dfdb;border-radius:12px;background:#fff;font-size:.95rem;font-family:inherit;color:#2c2c2c;cursor:pointer;transition:all .2s ease;text-align:left;line-height:1.5}
+.option-btn:hover{border-color:#c9a96e;background:rgba(201,169,110,.05)}
+.option-btn.selected{border-color:#c9a96e;background:rgba(201,169,110,.1)}
+.option-btn .option-letter{width:28px;height:28px;border-radius:8px;background:#f0eeeb;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;color:#8a8680;margin-right:.85rem;flex-shrink:0;transition:all .2s}
+.option-btn.selected .option-letter{background:#c9a96e;color:#fff}
+.result-header{text-align:center;margin-bottom:2rem}
+.result-badge{width:72px;height:72px;margin:0 auto 1rem;background:#f0eeeb;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem}
+.result-title{font-size:1.5rem;font-weight:700;margin-bottom:.25rem}
+.result-zodiac-name{font-size:1.75rem;font-weight:700;color:#c9a96e;margin-bottom:.25rem}
+.result-match{font-size:.85rem;color:#8a8680}
+.comparison-card{background:#fff;border:1px solid #e2dfdb;border-radius:16px;padding:1.5rem;margin-bottom:1.25rem}
+.comparison-title{font-size:.8rem;font-weight:600;color:#8a8680;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.comparison-row{display:flex;align-items:center;gap:1rem}
+.comparison-zodiac{flex:1;text-align:center}
+.comparison-zodiac .cz-icon{font-size:1.5rem;margin-bottom:.25rem}
+.comparison-zodiac .cz-name{font-size:.85rem;font-weight:700}
+.comparison-zodiac .cz-label{font-size:.7rem;color:#8a8680}
+.comparison-vs{font-size:.75rem;font-weight:700;color:#8a8680;text-transform:uppercase;letter-spacing:.1em}
+.comparison-same{text-align:center;padding:1rem;background:rgba(201,169,110,.1);border-radius:10px;font-size:.9rem;color:#c9a96e;font-weight:600}
+.chart-container{background:#fff;border:1px solid #e2dfdb;border-radius:16px;padding:1.25rem;margin-bottom:1.25rem}
+.chart-title{font-size:.8rem;font-weight:600;color:#8a8680;text-transform:uppercase;letter-spacing:.05em;margin-bottom:.75rem}
+#radarChart{width:100%;height:320px}
+.traits-card{background:#fff;border:1px solid #e2dfdb;border-radius:16px;padding:1.5rem;margin-bottom:1.25rem}
+.traits-title{font-size:.8rem;font-weight:600;color:#8a8680;text-transform:uppercase;letter-spacing:.05em;margin-bottom:1rem}
+.traits-list{font-size:.95rem;line-height:1.8;color:#2c2c2c}
+.traits-list li{list-style:none;padding-left:1.25rem;position:relative}
+.traits-list li::before{content:'';position:absolute;left:0;top:.65em;width:6px;height:6px;border-radius:50%;background:#c9a96e}
+.poster-card{background:#fff;border:1px solid #e2dfdb;border-radius:16px;padding:1.5rem;margin-bottom:1.25rem}
+#posterCanvas{width:100%;border-radius:12px;border:1px solid #e2dfdb}
+.poster-actions{display:flex;gap:.75rem;margin-top:1rem}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(100px);background:#2c2c2c;color:#fff;padding:.75rem 1.5rem;border-radius:10px;font-size:.85rem;z-index:1000;opacity:0;transition:all .3s ease;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.fade-in{animation:fadeIn .4s ease forwards}
+.scale-in{animation:scaleIn .4s ease forwards}
+@media(max-width:400px){.welcome-title{font-size:1.5rem}.question-text{font-size:1.1rem}.option-btn{padding:.85rem 1rem;font-size:.9rem}}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="page active" id="page-welcome">
+<div class="welcome-icon">&#9788;</div>
+<h1 class="welcome-title">你更适合哪个星座？</h1>
+<p class="welcome-subtitle">出生日期决定了你的太阳星座，但你的性格真的和它匹配吗？<br>回答20道趣味问题，发现你骨子里更适合的星座。</p>
+<div class="form-group">
+<label class="form-label">你的出生日期</label>
+<div class="date-inputs">
+<select id="birth-month"><option value="">月</option><option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option><option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option></select>
+<select id="birth-day"><option value="">日</option></select>
+</div>
+<div class="native-zodiac" id="native-zodiac"></div>
+</div>
+<button class="btn btn-primary" id="btn-start" disabled onclick="startQuiz()">开始测算</button>
+</div>
+<div class="page" id="page-quiz">
+<div class="quiz-header"><span class="quiz-progress-text" id="progress-text">1/20</span></div>
+<div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
+<div class="question-card">
+<div class="question-text" id="question-text"></div>
+<div class="options-list" id="options-list"></div>
+</div>
+<div class="btn-group">
+<button class="btn btn-outline" id="btn-prev" onclick="prevQuestion()" style="display:none">上一题</button>
+<button class="btn btn-primary" id="btn-next" onclick="nextQuestion()" disabled>下一题</button>
+</div>
+</div>
+<div class="page" id="page-result">
+<div class="result-header scale-in">
+<div class="result-badge" id="result-icon"></div>
+<div class="result-title">你更适合的星座是</div>
+<div class="result-zodiac-name" id="result-zodiac-name"></div>
+<div class="result-match" id="result-match"></div>
+</div>
+<div class="comparison-card fade-in" id="comparison-card"></div>
+<div class="chart-container fade-in"><div class="chart-title">性格维度对比</div><div id="radarChart"></div></div>
+<div class="traits-card fade-in" id="traits-card"></div>
+<div class="poster-card fade-in">
+<div class="chart-title">分享海报</div>
+<canvas id="posterCanvas" width="600" height="900"></canvas>
+<div class="poster-actions">
+<button class="btn btn-primary" onclick="savePoster()">保存海报</button>
+<button class="btn btn-outline" onclick="copyResult()">复制结果</button>
+</div>
+</div>
+<div class="btn-group" style="margin-top:1.5rem"><button class="btn btn-outline" onclick="restart()">重新测算</button></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<script>
+var ZODIACS={aries:{name:'白羊座',icon:'\u2648',element:'fire',date:'3/21-4/19',traits:['热情冲动','勇敢直率','行动力强','竞争意识强','天生领导者']},taurus:{name:'金牛座',icon:'\u2649',element:'earth',date:'4/20-5/20',traits:['务实稳重','享受生活','耐心坚韧','忠诚可靠','审美品味高']},gemini:{name:'双子座',icon:'\u264a',element:'air',date:'5/21-6/21',traits:['好奇心强','机智灵活','社交达人','适应力强','思维跳跃']},cancer:{name:'巨蟹座',icon:'\u264b',element:'water',date:'6/22-7/22',traits:['温柔体贴','重视家庭','直觉敏锐','念旧感伤','保护欲强']},leo:{name:'狮子座',icon:'\u264c',element:'fire',date:'7/23-8/22',traits:['自信大方','天生领袖','慷慨热情','创造力强','爱面子']},virgo:{name:'处女座',icon:'\u264d',element:'earth',date:'8/23-9/22',traits:['追求完美','细致入微','理性分析','勤奋踏实','服务精神']},libra:{name:'天秤座',icon:'\u264e',element:'air',date:'9/23-10/23',traits:['追求公平','优雅得体','善于社交','犹豫不决','审美极高']},scorpio:{name:'天蝎座',icon:'\u264f',element:'water',date:'10/24-11/22',traits:['洞察力强','意志坚定','神秘深邃','感情专一','占有欲强']},sagittarius:{name:'射手座',icon:'\u2650',element:'fire',date:'11/23-12/21',traits:['热爱自由','乐观开朗','冒险精神','哲学思考','直言不讳']},capricorn:{name:'摩羯座',icon:'\u2651',element:'earth',date:'12/22-1/19',traits:['事业心强','自律沉稳','目标明确','内敛务实','责任感强']},aquarius:{name:'水瓶座',icon:'\u2652',element:'air',date:'1/20-2/18',traits:['独立思考','创新求变','特立独行','人道主义','理想主义']},pisces:{name:'双鱼座',icon:'\u2653',element:'water',date:'2/19-3/20',traits:['浪漫多情','共情力强','艺术天赋','梦幻善良','直觉超群']}};
+var QUESTIONS=[{q:'周末早上醒来，你最想做的第一件事是？',opts:[{text:'立刻出门运动或冒险',scores:{aries:3,sagittarius:3,leo:2}},{text:'窝在家里做顿好吃的',scores:{taurus:3,cancer:3,virgo:2}},{text:'约朋友出去逛街聊天',scores:{gemini:3,libra:3,leo:2}},{text:'沉浸在自己的幻想世界里',scores:{pisces:3,aquarius:2,scorpio:2}}]},{q:'遇到一个棘手的问题，你的第一反应是？',opts:[{text:'立刻行动，边做边想',scores:{aries:3,sagittarius:2,leo:2}},{text:'冷静分析，列出利弊',scores:{virgo:3,capricorn:3,aquarius:2}},{text:'找人商量，集思广益',scores:{gemini:2,libra:3,cancer:2}},{text:'凭直觉做决定',scores:{pisces:3,scorpio:2,cancer:2}}]},{q:'在朋友眼中，你最可能是哪种人？',opts:[{text:'靠谱的军师，什么都问我就对了',scores:{capricorn:3,virgo:2,scorpio:2}},{text:'开心果，有我在不冷场',scores:{gemini:3,leo:3,sagittarius:2}},{text:'知心大姐/大哥，总能倾听',scores:{cancer:3,pisces:3,libra:2}},{text:'行动派，说到就能做到',scores:{aries:3,taurus:2,capricorn:2}}]},{q:'你最看重伴侣或朋友的哪个品质？',opts:[{text:'忠诚和安全感',scores:{cancer:3,taurus:3,scorpio:2}},{text:'独立和个人空间',scores:{aquarius:3,sagittarius:3,capricorn:2}},{text:'幽默和有趣的灵魂',scores:{gemini:3,sagittarius:2,leo:2}},{text:'温柔和共情能力',scores:{pisces:3,libra:2,cancer:2}}]},{q:'面对一个完全陌生的环境，你会？',opts:[{text:'兴奋地探索一切',scores:{aries:3,sagittarius:3,gemini:2}},{text:'先观察，再慢慢融入',scores:{virgo:2,scorpio:3,capricorn:2}},{text:'主动找话题搭讪',scores:{gemini:2,libra:3,leo:3}},{text:'有点紧张，想找个熟悉的人待着',scores:{cancer:3,pisces:2,taurus:2}}]},{q:'你理想中的假期是怎样的？',opts:[{text:'说走就走的冒险旅行',scores:{sagittarius:3,aries:3,aquarius:2}},{text:'精心规划的舒适度假',scores:{taurus:3,virgo:2,capricorn:2}},{text:'和朋友一起的热闹团建',scores:{leo:3,gemini:2,libra:3}},{text:'一个人安静地发呆或创作',scores:{pisces:3,aquarius:3,scorpio:2}}]},{q:'工作中你最不能忍受什么？',opts:[{text:'效率低下、拖拖拉拉',scores:{aries:3,capricorn:3,virgo:2}},{text:'不公平的待遇',scores:{libra:3,aquarius:3,leo:2}},{text:'缺乏创意、千篇一律',scores:{aquarius:3,pisces:2,gemini:2}},{text:'冷漠无情、没有人情味',scores:{cancer:3,pisces:2,libra:2}}]},{q:'你更认同哪种生活态度？',opts:[{text:'及时行乐，活在当下',scores:{aries:2,leo:3,sagittarius:3}},{text:'未雨绸缪，稳扎稳打',scores:{capricorn:3,taurus:3,virgo:2}},{text:'随心所欲，跟着感觉走',scores:{pisces:3,gemini:2,aquarius:2}},{text:'追求和谐，平衡一切',scores:{libra:3,taurus:2,cancer:2}}]},{q:'收到一份意外的礼物，你的反应是？',opts:[{text:'当场拆开，兴奋地表达感谢',scores:{aries:3,leo:3,sagittarius:2}},{text:'感动到想哭，珍藏起来',scores:{cancer:3,pisces:3,scorpio:2}},{text:'分析送礼人的意图',scores:{scorpio:2,virgo:3,capricorn:2}},{text:'想着怎么回礼才得体',scores:{libra:3,taurus:2,virgo:2}}]},{q:'深夜独处时，你最可能在做什么？',opts:[{text:'刷手机、看视频、玩游戏',scores:{gemini:2,aquarius:3,aries:2}},{text:'思考人生的意义',scores:{scorpio:3,aquarius:2,capricorn:2,pisces:2}},{text:'写日记或创作点什么',scores:{pisces:3,cancer:2,aquarius:2}},{text:'规划明天的待办事项',scores:{virgo:3,capricorn:3,taurus:2}}]},{q:'在团队项目中，你通常扮演什么角色？',opts:[{text:'领导者，指挥全局',scores:{leo:3,aries:3,capricorn:2}},{text:'智囊，出谋划策',scores:{aquarius:3,gemini:2,virgo:2}},{text:'协调者，让大家和睦相处',scores:{libra:3,cancer:2,pisces:2}},{text:'执行者，默默把活干完',scores:{taurus:3,virgo:3,capricorn:2}}]},{q:'你如何看待"规则"这件事？',opts:[{text:'规则就是用来打破的',scores:{aquarius:3,aries:2,sagittarius:2}},{text:'规则让生活更有序',scores:{virgo:3,capricorn:3,taurus:2}},{text:'看情况，灵活应对',scores:{gemini:3,libra:2,pisces:2}},{text:'有些规则需要被重新定义',scores:{scorpio:2,aquarius:2,leo:2}}]},{q:'你更容易被什么样的人吸引？',opts:[{text:'有野心、有目标的人',scores:{capricorn:3,aries:2,leo:3}},{text:'温柔体贴、善解人意的人',scores:{cancer:3,pisces:3,libra:2}},{text:'有趣幽默、见多识广的人',scores:{gemini:3,sagittarius:3,aquarius:2}},{text:'深沉神秘、有故事的人',scores:{scorpio:3,pisces:2,capricorn:2}}]},{q:'你花钱的风格更接近哪种？',opts:[{text:'该花就花，享受当下',scores:{aries:3,leo:3,sagittarius:2}},{text:'精打细算，每一分都有规划',scores:{virgo:3,capricorn:2,taurus:3}},{text:'为兴趣和体验买单，不心疼',scores:{aquarius:3,pisces:2,sagittarius:2}},{text:'追求品质，宁缺毋滥',scores:{libra:3,taurus:2,leo:2}}]},{q:'如果可以拥有一种超能力，你选？',opts:[{text:'读心术',scores:{scorpio:3,cancer:2,pisces:2}},{text:'时间暂停',scores:{capricorn:2,virgo:3,aquarius:2}},{text:'瞬间移动',scores:{sagittarius:3,aries:3,gemini:2}},{text:'治愈能力',scores:{pisces:3,cancer:3,virgo:2}}]},{q:'你对待感情的态度更像？',opts:[{text:'热烈奔放，爱就要轰轰烈烈',scores:{aries:3,leo:3,scorpio:2}},{text:'细水长流，慢慢培养',scores:{taurus:3,cancer:3,capricorn:2}},{text:'自由自在，不被束缚',scores:{sagittarius:3,aquarius:3,gemini:2}},{text:'全心全意，但需要安全感',scores:{cancer:2,pisces:3,scorpio:2}}]},{q:'你更喜欢哪种类型的电影？',opts:[{text:'动作冒险片',scores:{aries:3,sagittarius:2,leo:2}},{text:'悬疑推理片',scores:{scorpio:3,virgo:2,capricorn:2}},{text:'文艺爱情片',scores:{pisces:3,libra:2,cancer:2}},{text:'科幻脑洞片',scores:{aquarius:3,gemini:2,sagittarius:2}}]},{q:'朋友向你倾诉烦恼，你通常会？',opts:[{text:'帮他分析问题，给出建议',scores:{virgo:3,capricorn:2,aquarius:2}},{text:'先安慰情绪，再慢慢聊',scores:{cancer:3,pisces:3,libra:2}},{text:'讲自己的经历让他不孤单',scores:{gemini:2,sagittarius:2,leo:2}},{text:'陪他一起吐槽，帮他出气',scores:{aries:2,leo:3,scorpio:2}}]},{q:'你觉得自己最大的优点是？',opts:[{text:'执行力强，说到做到',scores:{aries:2,capricorn:3,taurus:2}},{text:'善解人意，体贴入微',scores:{cancer:3,pisces:3,libra:2}},{text:'思维活跃，点子多',scores:{gemini:3,aquarius:3,sagittarius:2}},{text:'坚韧不拔，百折不挠',scores:{scorpio:3,capricorn:2,taurus:2}}]},{q:'如果用一种颜色形容自己，你会选？',opts:[{text:'红色-热情有活力',scores:{aries:3,leo:2,sagittarius:2}},{text:'蓝色-沉静有深度',scores:{scorpio:2,aquarius:3,capricorn:2}},{text:'绿色-自然平和',scores:{taurus:2,libra:2,virgo:2,cancer:2}},{text:'紫色-神秘浪漫',scores:{pisces:3,scorpio:2,aquarius:2}}]}];
+var currentQ=0,answers=new Array(20).fill(null),nativeZodiac=null,resultZodiac=null,scores={};
+document.getElementById('birth-month').addEventListener('change',function(){updateDays();updateNativeZodiac()});
+document.getElementById('birth-day').addEventListener('change',updateNativeZodiac);
+function updateDays(){var m=parseInt(document.getElementById('birth-month').value),d=document.getElementById('birth-day'),days=[31,29,31,30,31,30,31,31,30,31,30,31],max=m?days[m-1]:31,cur=parseInt(d.value);d.innerHTML='<option value="">日</option>';for(var i=1;i<=max;i++)d.innerHTML+='<option value="'+i+'">'+i+'日</option>';if(cur&&cur<=max)d.value=cur}
+function getZodiacByDate(m,d){var dates=[[1,20,'aquarius'],[2,19,'pisces'],[3,21,'aries'],[4,20,'taurus'],[5,21,'gemini'],[6,22,'cancer'],[7,23,'leo'],[8,23,'virgo'],[9,23,'libra'],[10,24,'scorpio'],[11,23,'sagittarius'],[12,22,'capricorn']];for(var i=0;i<dates.length;i++)if(m===dates[i][0]&&d<dates[i][1])return dates[(i+11)%12][2];return dates[dates.length-1][2]}
+function updateNativeZodiac(){var m=parseInt(document.getElementById('birth-month').value),d=parseInt(document.getElementById('birth-day').value),el=document.getElementById('native-zodiac'),btn=document.getElementById('btn-start');if(m&&d){var k=getZodiacByDate(m,d);nativeZodiac=k;var z=ZODIACS[k];el.innerHTML='你的太阳星座是 <span class="zodiac-name">'+z.icon+' '+z.name+'</span>（'+z.date+'）';btn.disabled=false}else{nativeZodiac=null;el.innerHTML='';btn.disabled=true}}
+function showPage(id){var p=document.querySelectorAll('.page');for(var i=0;i<p.length;i++)p[i].classList.remove('active');document.getElementById(id).classList.add('active');window.scrollTo(0,0)}
+function startQuiz(){currentQ=0;answers=new Array(20).fill(null);scores={};showPage('page-quiz');renderQuestion()}
+function renderQuestion(){var q=QUESTIONS[currentQ];document.getElementById('progress-text').textContent=(currentQ+1)+' / 20';document.getElementById('progress-fill').style.width=((currentQ+1)/20*100)+'%';document.getElementById('question-text').textContent=q.q;var optList=document.getElementById('options-list');optList.innerHTML='';var letters=['A','B','C','D'];for(var i=0;i<q.opts.length;i++){var btn=document.createElement('button');btn.className='option-btn'+(answers[currentQ]===i?' selected':'');btn.innerHTML='<span class="option-letter">'+letters[i]+'</span><span>'+q.opts[i].text+'</span>';btn.onclick=(function(idx){return function(){selectOption(idx)}})(i);optList.appendChild(btn)}document.getElementById('btn-prev').style.display=currentQ>0?'inline-flex':'none';var nextBtn=document.getElementById('btn-next');nextBtn.textContent=currentQ===19?'查看结果':'下一题';nextBtn.disabled=answers[currentQ]===null}
+function selectOption(idx){answers[currentQ]=idx;var btns=document.querySelectorAll('.option-btn');for(var i=0;i<btns.length;i++)btns[i].classList.remove('selected');btns[idx].classList.add('selected');document.getElementById('btn-next').disabled=false}
+function nextQuestion(){if(currentQ<19){currentQ++;renderQuestion()}else{calculateResult()}}
+function prevQuestion(){if(currentQ>0){currentQ--;renderQuestion()}}
+function calculateResult(){scores={};var keys=Object.keys(ZODIACS);for(var k=0;k<keys.length;k++)scores[keys[k]]=0;for(var i=0;i<answers.length;i++)if(answers[i]!==null){var optScores=QUESTIONS[i].opts[answers[i]].scores;var sk=Object.keys(optScores);for(var j=0;j<sk.length;j++)scores[sk[j]]+=optScores[sk[j]]}var maxScore=0,maxKey=keys[0];for(var k=0;k<keys.length;k++)if(scores[keys[k]]>maxScore){maxScore=scores[keys[k]];maxKey=keys[k]}resultZodiac=maxKey;showResult()}
+function getDimensionScores(k){var dimMap={aries:[9,6,4,3,7,3],taurus:[5,4,7,5,6,9],gemini:[7,9,6,3,8,3],cancer:[4,5,4,9,6,7],leo:[8,8,4,5,8,5],virgo:[6,4,9,4,5,8],libra:[5,8,6,6,7,6],scorpio:[7,4,7,7,6,7],sagittarius:[8,7,5,4,7,3],capricorn:[7,3,9,3,5,9],aquarius:[6,6,8,5,9,4],pisces:[3,5,3,9,9,5]};return dimMap[k]||[5,5,5,5,5,5]}
+function showResult(){showPage('page-result');var rz=ZODIACS[resultZodiac],nz=nativeZodiac?ZODIACS[nativeZodiac]:null;document.getElementById('result-icon').textContent=rz.icon;document.getElementById('result-zodiac-name').textContent=rz.icon+' '+rz.name;document.getElementById('result-match').textContent='匹配度 '+Math.min(98,Math.round(60+scores[resultZodiac]*1.2))+'%';var compCard=document.getElementById('comparison-card');if(nativeZodiac&&nativeZodiac!==resultZodiac){compCard.innerHTML='<div class="comparison-title">原生星座 vs 测算星座</div><div class="comparison-row"><div class="comparison-zodiac"><div class="cz-icon">'+nz.icon+'</div><div class="cz-name">'+nz.name+'</div><div class="cz-label">你的原生星座</div></div><div class="comparison-vs">VS</div><div class="comparison-zodiac"><div class="cz-icon">'+rz.icon+'</div><div class="cz-name">'+rz.name+'</div><div class="cz-label">你更适合的星座</div></div></div>'}else if(nativeZodiac===resultZodiac){compCard.innerHTML='<div class="comparison-title">原生星座 vs 测算星座</div><div class="comparison-same">'+nz.icon+' 你的性格和原生星座 '+nz.name+' 高度吻合！你就是典型的 '+nz.name+'！</div>'}else{compCard.innerHTML='<div class="comparison-title">测算结果</div><div class="comparison-same">'+rz.icon+' 你更适合的星座是 '+rz.name+'</div>'}var traitsCard=document.getElementById('traits-card');traitsCard.innerHTML='<div class="traits-title">'+rz.icon+' '+rz.name+' 的性格特征</div><ul class="traits-list">';for(var i=0;i<rz.traits.length;i++)traitsCard.innerHTML+='<li>'+rz.traits[i]+'</li>';traitsCard.innerHTML+='</ul>';renderRadarChart();setTimeout(renderPoster,300)}
+function renderRadarChart(){var nativeData=nativeZodiac?getDimensionScores(nativeZodiac):null,resultData=getDimensionScores(resultZodiac);var seriesConfig=[{value:resultData,name:ZODIACS[resultZodiac].name+'（测算）',color:'#c9a96e'}];if(nativeZodiac&&nativeZodiac!==resultZodiac)seriesConfig.push({value:nativeData,name:ZODIACS[nativeZodiac].name+'（原生）',color:'#8a8680'});var option={animation:true,legend:{bottom:0,textStyle:{color:'#8a8680',fontSize:12},itemWidth:16,itemHeight:8},radar:{indicator:[{name:'行动力',max:10},{name:'社交力',max:10},{name:'理性',max:10},{name:'感性',max:10},{name:'创造力',max:10},{name:'稳定性',max:10}],shape:'circle',splitNumber:4,axisName:{color:'#8a8680',fontSize:12},splitLine:{lineStyle:{color:'#e2dfdb'}},splitArea:{show:false},axisLine:{lineStyle:{color:'#e2dfdb'}}},series:[{type:'radar',data:seriesConfig.map(function(s){return{value:s.value,name:s.name,lineStyle:{color:s.color,width:2},areaStyle:{color:s.color+'33'},itemStyle:{color:s.color},symbol:'circle',symbolSize:6}})]};var chartDom=document.getElementById('radarChart');var myChart=echarts.init(chartDom,null,{renderer:'svg'});myChart.setOption(option);window.addEventListener('resize',function(){myChart.resize()})}
+function renderPoster(){var canvas=document.getElementById('posterCanvas'),ctx=canvas.getContext('2d'),w=600,h=900;canvas.width=w*2;canvas.height=h*2;canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.scale(2,2);ctx.fillStyle='#faf9f7';ctx.fillRect(0,0,w,h);ctx.fillStyle='#c9a96e';ctx.fillRect(0,0,w,6);ctx.fillStyle='#2c2c2c';ctx.font='bold 28px sans-serif';ctx.textAlign='center';ctx.fillText('你更适合哪个星座？',w/2,60);ctx.fillStyle='#8a8680';ctx.font='14px sans-serif';ctx.fillText('趣味性格测算',w/2,85);ctx.strokeStyle='#e2dfdb';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(60,110);ctx.lineTo(w-60,110);ctx.stroke();var rz=ZODIACS[resultZodiac];ctx.fillStyle='#c9a96e';ctx.font='80px sans-serif';ctx.fillText(rz.icon,w/2,220);ctx.fillStyle='#2c2c2c';ctx.font='bold 36px sans-serif';ctx.fillText(rz.name,w/2,280);ctx.fillStyle='#8a8680';ctx.font='16px sans-serif';ctx.fillText('匹配度 '+Math.min(98,Math.round(60+scores[resultZodiac]*1.2))+'%',w/2,310);ctx.strokeStyle='#e2dfdb';ctx.beginPath();ctx.moveTo(60,340);ctx.lineTo(w-60,340);ctx.stroke();var y=380;if(nativeZodiac&&nativeZodiac!==resultZodiac){var nz=ZODIACS[nativeZodiac];ctx.fillStyle='#8a8680';ctx.font='12px sans-serif';ctx.fillText('原生星座 VS 测算星座',w/2,y);y+=40;ctx.font='40px sans-serif';ctx.fillStyle='#8a8680';ctx.fillText(nz.icon,w/2-100,y);ctx.fillStyle='#c9a96e';ctx.fillText(rz.icon,w/2+100,y);ctx.font='bold 18px sans-serif';ctx.fillStyle='#8a8680';ctx.fillText(nz.name,w/2-100,y+30);ctx.fillStyle='#c9a96e';ctx.fillText(rz.name,w/2+100,y+30);ctx.fillStyle='#e2dfdb';ctx.font='bold 14px sans-serif';ctx.fillText('VS',w/2,y+15)}else if(nativeZodiac===resultZodiac){ctx.fillStyle='#c9a96e';ctx.font='16px sans-serif';ctx.fillText('你的性格和原生星座 '+rz.name+' 高度吻合！',w/2,y)}y=500;ctx.strokeStyle='#e2dfdb';ctx.beginPath();ctx.moveTo(60,y);ctx.lineTo(w-60,y);ctx.stroke();y+=30;ctx.fillStyle='#2c2c2c';ctx.font='bold 16px sans-serif';ctx.fillText('性格特征',w/2,y);y+=30;ctx.font='14px sans-serif';ctx.fillStyle='#2c2c2c';for(var i=0;i<rz.traits.length;i++)ctx.fillText(rz.traits[i],w/2,y+i*28);ctx.strokeStyle='#e2dfdb';ctx.beginPath();ctx.moveTo(60,h-100);ctx.lineTo(w-60,h-100);ctx.stroke();ctx.fillStyle='#8a8680';ctx.font='12px sans-serif';ctx.fillText('来测测你更适合哪个星座吧',w/2,h-70);ctx.fillStyle='#e2dfdb';ctx.fillRect(w/2-30,h-60,60,60);ctx.fillStyle='#8a8680';ctx.font='10px sans-serif';ctx.fillText('扫码体验',w/2,h-25)}
+function savePoster(){var canvas=document.getElementById('posterCanvas'),link=document.createElement('a');link.download='星座测算结果.png';link.href=canvas.toDataURL('image/png');link.click();showToast('海报已保存')}
+function copyResult(){var rz=ZODIACS[resultZodiac],nz=nativeZodiac?ZODIACS[nativeZodiac]:null,text='【你更适合哪个星座？】\n';if(nz)text+='我的原生星座：'+nz.icon+' '+nz.name+'\n';text+='我更适合的星座：'+rz.icon+' '+rz.name+'\n';text+='性格特征：'+rz.traits.join('、')+'\n';text+='来测测你更适合哪个星座吧！';if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){showToast('结果已复制到剪贴板')})}else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);showToast('结果已复制到剪贴板')}}
+function restart(){currentQ=0;answers=new Array(20).fill(null);scores={};resultZodiac=null;showPage('page-welcome')}
+function showToast(msg){var toast=document.getElementById('toast');toast.textContent=msg;toast.classList.add('show');setTimeout(function(){toast.classList.remove('show')},2000)}
+</script>
+</body>
+</html>
